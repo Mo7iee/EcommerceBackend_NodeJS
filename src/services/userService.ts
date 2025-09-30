@@ -2,6 +2,7 @@ import type { RegisterDTO } from "./DTOs/registerDTO.ts";
 import type { LoginDTO } from "./DTOs/loginDTO.ts";
 import { userModel } from "../models/userModel.js";
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken'
 
 export const register = async ({ firstName, lastName, email, password }: RegisterDTO) => {
   const findUser = await userModel.findOne({ email });
@@ -23,9 +24,13 @@ export const login = async ({email,password}: LoginDTO) => {
 
     const passwordMatch = await bcrypt.compare(password, findUser.password);
     if(passwordMatch){
-        return { data: findUser, statusCode: 200 };
+        return { data: generateJWT({email,lastName:findUser.lastName,firstName:findUser.firstName}) , statusCode: 200 };
     }
         return { data: "Incorrect email or password!", statusCode: 400 };
    
 
+};
+const generateJWT = (data: any) =>{
+    return jwt.sign(data , 'mySecretKey',{expiresIn:'24h'})
 }
+
