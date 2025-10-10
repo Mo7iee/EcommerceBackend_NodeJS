@@ -16,6 +16,19 @@ export const getActiveCart = async ({ userId }:cartDTO) =>{
     }
     return cart;
 }
+export const clearCart = async ({ userId }: cartDTO) => {
+  const cart = await getActiveCart({ userId });
+
+  if (!cart) {
+    return { data: "Active cart not found", statusCode: 404 };
+  }
+
+  // ✅ Safe assignment
+  cart.items = [];
+  await cart.save();
+
+  return { data: "Cart cleared successfully", statusCode: 200 };
+};
 export const addItemToCart = async ({ productId,quantity,userId }:addItemToCartDTO) =>
     {
         const cart = await getActiveCart({userId})
