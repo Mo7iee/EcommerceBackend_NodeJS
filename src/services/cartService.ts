@@ -58,4 +58,36 @@ item.quantity = parseInt(quantity);
   await cart.save();
 
   return { data: "Cart item updated successfully", statusCode: 200 };
+
+};
+export const deleteItemInCart = async ({
+  userId,
+  productId,
+}: {
+  userId: string;
+  productId: string;
+}) => {
+  // 1️⃣ Find the active cart for this user
+  const cart = await getActiveCart({ userId });
+
+  if (!cart) {
+    return { data: "Active cart not found", statusCode: 404 };
+  }
+
+  // 2️⃣ Check if the product exists in the cart
+  const itemIndex = cart.items.findIndex(
+    (p: any) => p.product.toString() === productId
+  );
+
+  if (itemIndex === -1) {
+    return { data: "Product not found in cart", statusCode: 404 };
+  }
+
+  // 3️⃣ Remove it from the array
+  cart.items.splice(itemIndex, 1);
+
+  // 4️⃣ Save the updated cart
+  const updatedCart = await cart.save();
+
+  return { data: updatedCart, statusCode: 200 };
 };
