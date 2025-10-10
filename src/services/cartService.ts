@@ -33,4 +33,29 @@ export const addItemToCart = async ({ productId,quantity,userId }:addItemToCartD
         const updatedCart = await cart?.save();
 
         return { data: updatedCart, statusCode:200}
-    }
+    };
+    export const updateItemInCart = async ({
+  userId,
+  productId,
+  quantity,
+}: addItemToCartDTO) => {
+  const cart = await getActiveCart({ userId });
+
+  if (!cart) {
+    return { data: "Active cart not found", statusCode: 404 };
+  }
+
+  const item = cart.items.find(
+    (p: any) => p.product.toString() === productId
+  );
+
+  if (!item) {
+    return { data: "Product not found in cart", statusCode: 404 };
+  }
+
+  // Update quantity
+item.quantity = parseInt(quantity);
+  await cart.save();
+
+  return { data: "Cart item updated successfully", statusCode: 200 };
+};
